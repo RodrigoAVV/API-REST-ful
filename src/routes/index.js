@@ -9,5 +9,6 @@ router.get('/health',(_req, res) => {
         envronment: process.env.ENVIRONMENT || 'NOT FOUND'
     })
 })
-.use('/productos',productosRouter)
+//Se Cargan todas las rutas
+.use('/',productosRouter)
 module.exports = router

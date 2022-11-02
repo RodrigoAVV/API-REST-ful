@@ -1,5 +1,10 @@
 npm init -y
 npm install --save express dotenv
 npm install --save-dev nodemon
+npm install pug
+
+npm install --save ejs
+
+npm install --save lodash #Validación variables nulas
 
 npm run start:dev # Iniciar
