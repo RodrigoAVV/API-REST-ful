@@ -5,7 +5,8 @@ const Product = require('../../services/products.service')
 
 router.get('/',(_req,res) => {
     try {
-        return res.render('create')
+        //return res.render('create')
+        res.sendFile('index.html',{root: __dirname})
     } catch (error) {
         res.status(500).json(error)
     }

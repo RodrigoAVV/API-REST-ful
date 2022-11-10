@@ -6,5 +6,6 @@ npm install pug
 npm install --save ejs
 
 npm install --save lodash #Validación variables nulas
+npm install socket.io
 
 npm run start:dev # Iniciar
