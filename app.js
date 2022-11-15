@@ -14,7 +14,6 @@ const app = express()
 const http = new HttpServer(app)
 const io = new IoServer(http)
 
-
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(__dirname + '/public'))
@@ -31,17 +30,26 @@ const messages = []
 io.on('connection',(socket) => {
     socket.emit('UPDATE_DATA',messages)
     socket.on('NEW_MESSAGE_CLI',data => {
+        //console.log(data)
         const messageData = {content:data}
         messages.push(messageData)
         io.sockets.emit('NEW_MESSAGE',messageData)
     })
 })
 
-const products = {}
-io.on('connection',(socket) => {
+let products = [
+    {
+        "id": 1,
+        "titulo": "Hamburguesa",
+        "precio": 3890,
+        "imagen": "https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/hamburger-fast-food-patty-bread-64.png"
+    }
+]
+io.on('connection', (socket) => {
     socket.emit('UPDATE_PRODUCT',products)
-    socket.on('NEW_MESSAGE_PROD',data => {
-        const messageData = {content:data}
+    socket.on('NEW_PRODUCT_CLI',data => {
+        console.log(data)
+        const messageData = {id:data.id,titulo:data.titulo,precio:data.precio,imagen:data.imagen}
         products.push(messageData)
         io.sockets.emit('NEW_PRODUCT',messageData)
     })

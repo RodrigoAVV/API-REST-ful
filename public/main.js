@@ -3,9 +3,9 @@ const socket = io()
 const messages = []
 
 
-function updateMessages(message){
+function updateMessages(messages){
     let messagesToList = ''
-    console.log(message)
+    //console.log(message)
     messages.forEach(i => {
         messagesToList = messagesToList + `<li> ${i.content}</li>`
     })
@@ -39,29 +39,39 @@ socket.on('UPDATE_DATA',messagesArray => {
     updateMessages(messages)
 })
 
-const products = {}
-function updateProducts(product){
+let id = 1
+let products = [
+    {
+        "id": 1,
+        "titulo": "Hamburguesa",
+        "precio": 3890,
+        "imagen": "https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/hamburger-fast-food-patty-bread-64.png"
+    }
+]
+
+function updateProducts(products){
     let messagesToList = ''
-    console.log(mesproduct)
-    messages.forEach(i => {
-        messagesToList = messagesToList + `<tr>
-            <td>${i.id}</td>
-            <td>${i.title}</td>
-            <td>${i.price}</td>
-            <td>${i.image}</td>
+    //console.log(product)
+    products.forEach(i => {
+        messagesToList = messagesToList + `<tr> 
+        <td>${i.id}</td>
+        <td>${i.titulo}</td>
+        <td>${i.precio}</td>
+        <td><img src="${i.imagen}"></td>
         </tr>`
     })
     document.querySelector('#dataProduct').innerHTML = messagesToList
 }
-let id = 0
+
 function senNewProduct(){
     const title = document.querySelector('#titulo').value
     const price = document.querySelector('#precio').value
     const image = document.querySelector('#imagen').value
-    id + 1
-    let product = {id:id,title:title,price:price,image:image}
-    
-    socket.emit('NEW_MESSAGE_PROD',product)
+    id = id + 1
+    if(title == '' || price == '' || image == '') return
+    const product = {id:id,titulo:title,precio:price,imagen:image}
+    //console.log(product) //se crea 
+    socket.emit('NEW_PRODUCT_CLI',product)
     document.querySelector('#titulo').value = ''
     document.querySelector('#precio').value = ''
     document.querySelector('#imagen').value = ''
@@ -70,7 +80,7 @@ function senNewProduct(){
 
 socket.on('NEW_PRODUCT',data => {
     products.push(data)
-    updateProducts(messages)
+    updateProducts(products)
 })
 
 socket.on('UPDATE_PRODUCT',messagesArray => {
