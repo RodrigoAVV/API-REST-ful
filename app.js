@@ -17,7 +17,7 @@ const io = new IoServer(http)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(express.static('public'))
+app.use(express.static(__dirname + '/public'))
 
 app.use(logger('dev'))
 
@@ -26,8 +26,24 @@ app.use(logger('dev'))
 
 app.use('/',indexRouter)
 //app.use('/views',express.static(__dirname + '/views'))
+const messages = []
+
 io.on('connection',(socket) => {
-    console.log(socket)
-    socket.emit('OK_CONNECTION',{message:`Socket id: ${socket.id}`})
+    socket.emit('UPDATE_DATA',messages)
+    socket.on('NEW_MESSAGE_CLI',data => {
+        const messageData = {content:data}
+        messages.push(messageData)
+        io.sockets.emit('NEW_MESSAGE',messageData)
+    })
 })
-module.exports = app
+
+const products = {}
+io.on('connection',(socket) => {
+    socket.emit('UPDATE_PRODUCT',products)
+    socket.on('NEW_MESSAGE_PROD',data => {
+        const messageData = {content:data}
+        products.push(messageData)
+        io.sockets.emit('NEW_PRODUCT',messageData)
+    })
+})
+module.exports = http
