@@ -1,38 +1,73 @@
-let products = [
-    {
-        "id": 1,
-        "titulo": "Hamburguesa",
-        "precio": 3890,
-        "imagen": "https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/hamburger-fast-food-patty-bread-64.png"
-    },
-    {
-        "id": 2,
-        "titulo": "pizza",
-        "precio": 5600,
-        "imagen": "https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/pizza-fast-food-bake-bread-64.png"
-    },
-    {
-        "id": 3,
-        "titulo": "Sopa caliente",
-        "precio": 1890,
-        "imagen": "https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/noodles-bowl-food-ramen-soup-64.png"
-    }
-]
+const {options} = require('../../database/create/create.knex')
+const knex = require('knex')
+const {v4:uuidv4} = require('uuid')
 class Product{
-    constructor(){}
-    getProduct(){
-        return products
+    constructor(){
+        this.knex = knex(options)
+    }
+    async getProducts(){
+        try {
+            const data = await this.knex.from('productos').select('*')
+            if(data.length == 0){
+                return{
+                    success:false,
+                    message:'Productos no disponibles'
+                }
+            }
+            const productoFormat = JSON.parse(JSON.stringify(data))
+            return{
+                success:true,
+                data:productoFormat
+            }
+        } catch (err) {
+            return{
+                success:false,
+                message:err.message
+            }
+        }
     }
 
-    postProduct(product){
-        products.push(product)
-        return product
+    async getProduct(productCode){
+        try {
+            const data = await this.knex.from('productos').where('codigo','=',productCode).select('*')
+            if(data.length == 0){
+                return{
+                    success:false,
+                    message:'Product not found'
+                }
+            }
+            const productFormat = JSON.parse(JSON.stringify(data[0]))
+            return{
+                success:true,
+                data:productFormat
+            }
+        } catch (err) {
+            console.error(err)
+            return{
+                success:false,
+                message:err.message
+            }
+        }
+    }
+    async createProduct(product){
+        Object.assign(product,{
+            codigo:uuidv4()
+        })
+        return  new Promise((resolve, reject) => {
+            this.knex('productos').insert(product).then(() => {
+                resolve({
+                    succes:true,
+                    data:product
+                })
+            }).catch(err => {
+                reject(err)
+            }).finally(() => {
+                this.knex.destroy()
+            })
+        })
     }
 
-    selfGenerator(){
-        let cant = products.length
-        return products[cant-1].id + 1
-    }
+    
 }
 
 module.exports = Product

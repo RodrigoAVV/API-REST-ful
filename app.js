@@ -3,9 +3,11 @@ const express = require('express')
 const {Server: HttpServer} = require('http')
 const {Server:IoServer} = require('socket.io')
 
-const _ = require('lodash')
+const _ = require('lodash');
 const indexRouter = require('./src/routes/index')
 require('dotenv').config()
+
+const errorHandler = require('./src/middlewares/errorHandler')
 
 const logger = require('morgan')
 
@@ -20,10 +22,13 @@ app.use(express.static(__dirname + '/public'))
 
 app.use(logger('dev'))
 
+app.use(errorHandler)
+
 //app.set('views','./views')
 //app.set('view engine', 'ejs')
 
 app.use('/',indexRouter)
+
 //app.use('/views',express.static(__dirname + '/views'))
 const messages = []
 

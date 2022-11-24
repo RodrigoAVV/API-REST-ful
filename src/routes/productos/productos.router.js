@@ -1,35 +1,57 @@
 const express = require('express')
 const router = express.Router()
+const _= require('lodash')
 
 const Product = require('../../services/products.service')
 
-router.get('/',(_req,res) => {
+const product = new Product()
+
+router.get('/',async (_req,res,next) => {
     try {
-        //return res.render('create')
-        res.sendFile('index.html',{root: __dirname})
-    } catch (error) {
-        res.status(500).json(error)
+        const data = await product.getProducts()
+        if(!data.success){
+            return res.status(400).json(data)
+        }
+        res.status(200).json(data)
+    } catch (err) {
+        next(err)
     }
 })
 
-router.get('/productos',(_req,res) => {
+router.get('/:id',async (req,res, next) => {
+    const { id } = req.params
+    if(_.isNil(id)){
+        return res.status(400).json({
+            success:false,
+            message:'Bad request'
+        })
+    }
     try {
-        const product = new Product()
-        return res.render('index',{productos:product.getProduct()})
-    } catch (error) {
-        res.status(500).json(error)
+        const data = await product.getProduct(id)
+        if(!data.success){
+            return res.status(400).json(data)
+        }
+        res.status(200).json(data)
+    } catch (err) {
+        next(err)
     }
 })
-
-router.post('/productos',(req,res) =>  {
+router.post('/', async (req,res,next) =>  {
+    const { body } = req
+    if(_.isNil(body)){
+        return res.status(400).json({
+            success:false,
+            message:'Bad request'
+        })
+    }
     try {
-        const product = new Product()
-        const { body } = req
-        body.id = product.selfGenerator()
-        product.postProduct(body)
-        return res.redirect('/productos')
-    } catch (error) {
-        res.status(500).json(error)
+        const data = await product.createProduct(body)
+        if(!data.succes){
+            return res.status(400).json(data)
+        }
+        res.status(200).json(data)
+    } catch (err) {
+        next(err)
     }
 })
 
